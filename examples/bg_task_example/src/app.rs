@@ -44,11 +44,13 @@ impl eframe::App for DemoApp {
 
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         egui::CentralPanel::default().show(ctx, |ui| {
+            let now = Instant::now();
+
             ui.heading("File Downloader");
             ui.separator();
             ui.horizontal(|ui| {
                 ui.label("Current time:");
-                ui.label(format!("{:?}", Instant::now()));
+                ui.label(format!("{:?}", now));
             });
             ui.separator();
             ui.horizontal(|ui| {

@@ -21,6 +21,8 @@ fn main() -> eframe::Result<()> {
 #[cfg(target_arch = "wasm32")]
 fn main() {
     eframe::WebLogger::init(log::LevelFilter::Debug).ok();
+    wasm_logger::init(wasm_logger::Config::default());
+    log::info!("Loaded main.rs!");
 
     let web_options = eframe::WebOptions::default();
 

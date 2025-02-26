@@ -26,7 +26,10 @@ impl task_simple::StateTrait for DownloadState {
     type Event = DownloadProgress;
 
     fn progress(&mut self) -> task_simple::StateProgress<Self::Event> {
+        let now = Instant::now();
+
         if !self.is_downloading {
+            log::info!("progress: nothing ongoing {:?}", now);
             return task_simple::StateProgress::NothingOngoing;
         }
 
@@ -34,12 +37,14 @@ impl task_simple::StateTrait for DownloadState {
             let elapsed = start_time.elapsed().as_secs_f64();
             if elapsed > 0.0 {
                 let speed = self.bytes_downloaded as f64 / elapsed;
+                log::info!("progress: {speed} {:?}", now);
                 return task_simple::StateProgress::Event(DownloadProgress {
                     speed_bytes_per_sec: speed,
                 });
             }
         }
 
+        log::info!("progress: ongoing {:?}", now);
         task_simple::StateProgress::Ongoing
     }
 }
@@ -90,6 +95,7 @@ impl task_simple::BackgroundFunction for DownloadFunction {
                 // Busy wait
             }
 
+            log::info!("downloading chunk {i}");
             state.bytes_downloaded += chunk_size;
 
             // Send progress update
@@ -105,6 +111,7 @@ impl task_simple::BackgroundFunction for DownloadFunction {
         }
 
         state.is_downloading = false;
+        log::info!("downloading finished");
     }
 
     fn event_merge(event: &mut Self::Event, other: Self::Event) {
